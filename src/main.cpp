@@ -57,15 +57,18 @@ int main(int argc, char **argv) {
   const char* response = "+PONG\r\n";
   // send(client_fd, response, strlen(response), 0);
   char buffer[1024] = {0};
-  int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-  if(bytes_received<0){
-    std::cerr << "failed to read\n";
-    return 1;
+  while(true){
+    int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
+    if(bytes_received<0){
+      std::cerr << "failed to read\n";
+      return 1;
+    }
+    std::string req(buffer);
+    if(req.find("PING")!=std::string::npos){
+      send(client_fd, response, strlen(response),0);
+    }
   }
-  std::string req(buffer);
-  if(req.find("PING")!=std::string::npos){
-    send(client_fd, response, strlen(response),0);
-  }
+  
   close(client_fd);
   close(server_fd);
 
